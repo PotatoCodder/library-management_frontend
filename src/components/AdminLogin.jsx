@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+// Login.js
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-export default function AdminLogin() {
+import { AuthContext } from '../context/AuthContext';
+
+export default function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,25 +22,21 @@ export default function AdminLogin() {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:3001/admin-login', {
+      const res = await fetch('http://localhost:3001/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.role) {
         setIsSuccess(true);
         setMessage('✅ Login successful! Redirecting...');
-        localStorage.setItem("isAdmin", "true");
-
-        // You can redirect later, after user clicks OK
+        login(data.role, data.username);
       } else {
         setIsSuccess(false);
-        setMessage(`❌ ${data.message}`);
+        setMessage(`❌ ${data.message || 'Login failed.'}`);
       }
     } catch (error) {
       setIsSuccess(false);
@@ -48,15 +50,19 @@ export default function AdminLogin() {
   const handleOkClick = () => {
     setMessage('');
     if (isSuccess) {
-      // Optional: Redirect after success
-      window.location.href = '/add-book'; // Replace with your actual admin path
+      const role = localStorage.getItem('role');
+      if (role === 'admin') {
+        navigate('/add-book');
+      } else {
+        navigate('/user-home'); // Replace with your actual user page
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 relative">
       <div className="bg-gray-800 p-8 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-center text-teal-400 mb-6">Admin Login</h2>
+        <h2 className="text-2xl font-bold text-center text-teal-400 mb-6">Login</h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-gray-300 mb-1">Username</label>
