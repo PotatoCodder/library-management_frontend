@@ -6,6 +6,7 @@ import AddBooks from './components/AddBooks'; // Example route component
 import BookSearch from './components/BookSearch';
 import HeroSection from './components/HeroSection';
 import AdminLogin from './components/AdminLogin';
+import Register from './components/RegisterUsers'
 
 function App() {
   console.log(localStorage)
@@ -20,6 +21,7 @@ function App() {
           <Route path="/add-book" element={<AddBooks />} />
           <Route path="/search-book" element={<BookSearch />} />
           <Route path='/login' element={<AdminLogin />} />
+          <Route path='/register' element={<Register />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>

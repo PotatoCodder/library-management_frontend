@@ -17,6 +17,7 @@ export default function Login() {
   };
 
   const handleLogin = async (e) => {
+    
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -54,7 +55,7 @@ export default function Login() {
       if (role === 'admin') {
         navigate('/add-book');
       } else {
-        navigate('/user-home'); // Replace with your actual user page
+        navigate('/'); // Replace with your actual user page
       }
     }
   };

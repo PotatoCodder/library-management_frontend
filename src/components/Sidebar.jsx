@@ -28,6 +28,13 @@ export default function Sidebar() {
       {/* Sidebar Navigation */}
       <nav className="mt-6 px-4 space-y-3">
         <ul>
+          <Link
+            to="/register"
+            className="flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-teal-600 transition duration-200"
+          >
+            <PlusCircle className="text-xl text-teal-400" />
+            <span>register</span>
+          </Link>
           {isLoggedIn && isAdmin && (
             <>
               <li>
