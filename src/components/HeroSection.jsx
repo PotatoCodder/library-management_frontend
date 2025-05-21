@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/logo-ptc.png';
 
 export default function HeroSection() {
   return (
@@ -8,7 +9,18 @@ export default function HeroSection() {
       <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-teal-700 opacity-30 rounded-full animate-pulse"></div>
       <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-teal-500 opacity-20 rounded-full animate-ping"></div>
 
+      {/* Content */}
       <div className="max-w-3xl text-center z-10">
+        
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img
+            src={logo}
+            alt="PTC Logo"
+            className="h-24 w-24 object-contain rounded-full shadow-lg border-2 border-teal-400 hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+
         <h1 className="text-5xl font-extrabold mb-6 leading-tight text-teal-400">
           Manage Your Library Effortlessly
         </h1>
