@@ -1,70 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const BookSearch = () => {
+export default function BookSearch() {
   const [query, setQuery] = useState('');
-  const [books, setBooks] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const searchBooks = async () => {
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+
     setLoading(true);
+    setMessage('');
+
     try {
-      const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setBooks(data.docs.slice(0, 10)); // limit to top 10 results
+      const res = await fetch('http://localhost:3001/books');
+      const books = await res.json();
+
+      const filtered = books.filter(book =>
+        book.title.toLowerCase().includes(query.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        setIsSuccess(false);
+        setMessage('❌ No books found.');
+      } else {
+        setResults(filtered);
+        setIsSuccess(true);
+        setMessage(`✅ Found ${filtered.length} book(s)!`);
+      }
     } catch (error) {
       console.error('Error fetching books:', error);
+      setIsSuccess(false);
+      setMessage('❌ Failed to fetch books.');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="bg-gray-900 text-white min-h-screen p-8 ml-64 pt-24">
-      <h1 className="text-3xl font-bold text-teal-400 mb-6">📚 Search Books</h1>
+  useEffect(() => {
+    if (query.trim() === '') {
+      setResults([]);
+      setMessage('');
+    }
+  }, [query]);
 
-      <div className="flex gap-3 mb-8">
-        <input
-          type="text"
-          placeholder="Search by title..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-        />
-        <button
-          onClick={searchBooks}
-          className="bg-teal-500 hover:bg-teal-600 text-white px-5 py-3 rounded-lg transition"
-        >
-          Search
-        </button>
+  const handleOkClick = () => {
+    setMessage('');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-10 relative">
+      <div className="bg-gray-800 p-8 rounded shadow-md w-full max-w-2xl">
+        <h2 className="text-3xl font-bold text-center text-teal-400 mb-6">Search Books</h2>
+
+        <div className="flex mb-6">
+          <input
+            type="text"
+            placeholder="Enter book title..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="flex-grow px-4 py-2 rounded-l bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-r transition duration-200"
+          >
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {results.map((book) => (
+            <div
+              key={book.id}
+              className="bg-gray-700 rounded-lg shadow-md p-4 flex space-x-4 items-start"
+            >
+              <img
+                src={book.image}
+                alt={book.title}
+                className="w-20 h-28 object-cover rounded border border-gray-600"
+              />
+              <div>
+                <h3 className="text-teal-300 text-lg font-semibold">{book.title}</h3>
+                <p className="text-gray-300">by {book.author}</p>
+                <p className="text-gray-400 text-sm">Published: {book.year}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Loading Spinner */}
-      {loading && (
-        <div className="flex justify-center items-center mt-10">
-          <div className="w-12 h-12 border-4 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
+      {message && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white text-black rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <p className={`mb-4 font-semibold ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+              {message}
+            </p>
+            <button
+              onClick={handleOkClick}
+              className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition duration-200"
+            >
+              OK
+            </button>
+          </div>
         </div>
-      )}
-
-      {!loading && books.length > 0 && (
-        <ul className="space-y-6">
-          {books.map((book, idx) => (
-            <li key={idx} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-              <h2 className="text-xl font-semibold text-teal-300">{book.title}</h2>
-              <p className="text-gray-300">Author: {book.author_name?.join(', ') || 'Unknown'}</p>
-              <p className="text-gray-400">First Published: {book.first_publish_year || 'N/A'}</p>
-              {book.cover_i && (
-                <img
-                  src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
-                  alt="Book Cover"
-                  className="w-24 mt-4 rounded"
-                />
-              )}
-            </li>
-          ))}
-        </ul>
       )}
     </div>
   );
-};
-
-export default BookSearch;
+}
