@@ -32,6 +32,8 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok && data.role) {
+        localStorage.setItem("user", formData.username);
+        localStorage.setItem("pass", formData.password);
         setIsSuccess(true);
         setMessage('✅ Login successful! Redirecting...');
         login(data.role, data.username);

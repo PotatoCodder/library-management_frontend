@@ -1,7 +1,7 @@
 // Sidebar.js
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Book, PlusCircle, Search, User, LogOut } from 'lucide-react';
+import { Book, PlusCircle, Search, User, LogOut, Library } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Sidebar() {
@@ -78,6 +78,16 @@ export default function Sidebar() {
                 >
                   <LogOut className="text-xl text-red-400" />
                   <span>Logout</span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-red-600 transition duration-200"
+                >
+                  <Library className="text-xl text-teal-400" />
+                  <span>BooksBorrowed</span>
                 </button>
               </li>
             </>

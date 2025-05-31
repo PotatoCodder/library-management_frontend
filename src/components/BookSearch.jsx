@@ -18,10 +18,13 @@ export default function BookSearch() {
       const res = await fetch('http://localhost:3001/books');
       const books = await res.json();
 
-      const filtered = books.filter((book) => {
-        const targetValue = book[filterBy]?.toString().toLowerCase();
-        return targetValue?.includes(query.toLowerCase());
-      });
+      const filtered = books
+        .filter(book => !book.isBorrowed)  // <-- Filter out borrowed books here
+        .filter((book) => {
+          const targetValue = book[filterBy]?.toString().toLowerCase();
+          return targetValue?.includes(query.toLowerCase());
+        });
+
 
       if (filtered.length === 0) {
         setIsSuccess(false);
@@ -41,6 +44,37 @@ export default function BookSearch() {
     }
   };
 
+  const handleBorrow = async (book) => {
+  const username = localStorage.getItem('user'); // just get the plain string
+
+  if (!username) {
+    alert('⚠️ You must be logged in to borrow a book.');
+    return;
+  }
+
+  try {
+    // 1. Update the book to mark it as borrowed
+    await fetch(`http://localhost:3001/books/borrow/${book.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    // 2. Update user's borrowed books list
+    await fetch(`http://localhost:3001/users/borrow/${username}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookTitle: book.title })
+    });
+
+    alert(`✅ You borrowed "${book.title}"!`);
+    handleSearch(); // Refresh the list
+  } catch (error) {
+    console.error('Borrow error:', error);
+    alert('❌ Failed to borrow book.');
+  }
+};
+
+
   useEffect(() => {
     if (query.trim() === '') {
       setResults([]);
@@ -49,9 +83,11 @@ export default function BookSearch() {
   }, [query]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-10 relative">
-      <div className="bg-gray-800 p-8 rounded shadow-md w-full max-w-3xl">
-        <h2 className="text-3xl font-bold text-center text-teal-400 mb-6">Search Books</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-10">
+      <div className="bg-gray-800 p-8 rounded shadow-md w-full max-w-4xl">
+        <h2 className="text-3xl font-bold text-center text-teal-400 mb-6">
+          Search Books
+        </h2>
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
@@ -79,7 +115,11 @@ export default function BookSearch() {
         </div>
 
         {message && (
-          <div className={`text-center mb-4 font-semibold ${isSuccess ? 'text-green-400' : 'text-red-400'}`}>
+          <div
+            className={`text-center mb-4 font-semibold ${
+              isSuccess ? 'text-green-400' : 'text-red-400'
+            }`}
+          >
             {message}
           </div>
         )}
@@ -101,11 +141,27 @@ export default function BookSearch() {
                   No Image
                 </div>
               )}
-              <div>
-                <h3 className="text-teal-300 text-lg font-semibold">{book.title}</h3>
+              <div className="flex-grow">
+                <h3 className="text-teal-300 text-lg font-semibold">
+                  {book.title}
+                </h3>
                 <p className="text-gray-300">by {book.author}</p>
-                <p className="text-gray-400 text-sm">Published: {book.year}</p>
+                <p className="text-gray-400 text-sm">
+                  Published: {book.year}
+                </p>
               </div>
+              {!book.isBorrowed ? (
+                <button
+                  onClick={() => handleBorrow(book)}
+                  className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                >
+                  Borrow
+                </button>
+              ) : (
+                <span className="text-red-400 text-sm font-semibold mt-2 block">
+                  Already Borrowed
+                </span>
+              )}
             </div>
           ))}
         </div>
