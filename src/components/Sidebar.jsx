@@ -35,6 +35,7 @@ export default function Sidebar() {
             <PlusCircle className="text-xl text-teal-400" />
             <span>register</span>
           </Link>
+          
           {isLoggedIn && isAdmin && (
             <>
               <li>
@@ -82,13 +83,13 @@ export default function Sidebar() {
               </li>
 
               <li>
-                <button
-                  onClick={handleLogout}
+                <Link
+                  to="/borrowed-books"
                   className="w-full flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-red-600 transition duration-200"
                 >
                   <Library className="text-xl text-teal-400" />
                   <span>BooksBorrowed</span>
-                </button>
+                </Link>
               </li>
             </>
           )}

@@ -7,6 +7,7 @@ import BookSearch from './components/BookSearch';
 import HeroSection from './components/HeroSection';
 import AdminLogin from './components/AdminLogin';
 import Register from './components/RegisterUsers'
+import BooksBorrowed from './components/BooksBorrowed';
 
 function App() {
   console.log(localStorage)
@@ -22,6 +23,7 @@ function App() {
           <Route path="/search-book" element={<BookSearch />} />
           <Route path='/login' element={<AdminLogin />} />
           <Route path='/register' element={<Register />} />
+          <Route path='/borrowed-books' element={<BooksBorrowed />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>
