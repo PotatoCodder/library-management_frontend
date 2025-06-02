@@ -27,15 +27,7 @@ export default function Sidebar() {
 
       {/* Sidebar Navigation */}
       <nav className="mt-6 px-4 space-y-3">
-        <ul>
-          <Link
-            to="/register"
-            className="flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-teal-600 transition duration-200"
-          >
-            <PlusCircle className="text-xl text-teal-400" />
-            <span>register</span>
-          </Link>
-          
+        <ul>          
           {isLoggedIn && isAdmin && (
             <>
               <li>
@@ -95,15 +87,27 @@ export default function Sidebar() {
           )}
 
           {!isLoggedIn && (
-            <li>
-              <Link
-                to="/login"
-                className="flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-teal-600 transition duration-200"
-              >
-                <User className="text-xl text-teal-400" />
-                <span>Login</span>
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link
+                  to="/register"
+                  className="flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-teal-600 transition duration-200"
+                >
+                  <PlusCircle className="text-xl text-teal-400" />
+                  <span>register</span>
+                </Link>
+              </li>
+  
+              <li>
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-4 p-3 rounded-lg text-lg font-medium hover:bg-teal-600 transition duration-200"
+                >
+                  <User className="text-xl text-teal-400" />
+                  <span>Login</span>
+                </Link>
+              </li>
+            </>
           )}
         </ul>
       </nav>
