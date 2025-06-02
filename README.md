@@ -1,7 +1,21 @@
+use librarymanagement;
+
+ALTER TABLE users
+ADD borrowedBooks VARCHAR(200);
+
+ALTER TABLE books
+ADD isBorrowed boolean;
+
+
+
+
+
+
+
 DATABASE QUERY
 
 
-// e paste nyo to sa phpmyadmin sa sql \\
+// e paste nyo to sa phpmyadmin sa sql
 CREATE DATABASE librarymanagement;
 USE librarymanagement;
 
@@ -9,7 +23,7 @@ CREATE TABLE admin (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(100) NOT NULL,
   password VARCHAR(255) NOT NULL
-);
+);4
 
 INSERT INTO admin (username, password) 
 VALUES ('admin', 'admin');
@@ -19,17 +33,16 @@ CREATE TABLE books (
   title VARCHAR(255) NOT NULL,
   author VARCHAR(255) NOT NULL,
   year_published YEAR,
-  cover LONGBLOB
+  cover LONGBLOB,
+  isBorrowed boolean
 );
-
-use librarymanagement;
 
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL
+  borrowedBooks varchar(50)
 );
-
 
 
 

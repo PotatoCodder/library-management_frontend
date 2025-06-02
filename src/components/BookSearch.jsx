@@ -16,15 +16,21 @@ export default function BookSearch() {
 
     try {
       const res = await fetch('http://localhost:3001/books');
-      const books = await res.json();
+      const rawBooks = await res.json();
 
+      // Normalize isBorrowed to a boolean
+      const books = rawBooks.map(book => ({
+        ...book,
+        isBorrowed: book.isBorrowed === 1
+      }));
+
+      // Filter only books that are NOT borrowed and match the query
       const filtered = books
-        .filter(book => !book.isBorrowed)  // <-- Filter out borrowed books here
-        .filter((book) => {
+        .filter(book => !book.isBorrowed)
+        .filter(book => {
           const targetValue = book[filterBy]?.toString().toLowerCase();
           return targetValue?.includes(query.toLowerCase());
         });
-
 
       if (filtered.length === 0) {
         setIsSuccess(false);
@@ -45,35 +51,32 @@ export default function BookSearch() {
   };
 
   const handleBorrow = async (book) => {
-  const username = localStorage.getItem('user'); // just get the plain string
+    const username = localStorage.getItem('user');
 
-  if (!username) {
-    alert('⚠️ You must be logged in to borrow a book.');
-    return;
-  }
+    if (!username) {
+      alert('⚠️ You must be logged in to borrow a book.');
+      return;
+    }
 
-  try {
-    // 1. Update the book to mark it as borrowed
-    await fetch(`http://localhost:3001/books/borrow/${book.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    try {
+      await fetch(`http://localhost:3001/books/borrow/${book.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-    // 2. Update user's borrowed books list
-    await fetch(`http://localhost:3001/users/borrow/${username}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookTitle: book.title })
-    });
+      await fetch(`http://localhost:3001/users/borrow/${username}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookTitle: book.title })
+      });
 
-    alert(`✅ You borrowed "${book.title}"!`);
-    handleSearch(); // Refresh the list
-  } catch (error) {
-    console.error('Borrow error:', error);
-    alert('❌ Failed to borrow book.');
-  }
-};
-
+      alert(`✅ You borrowed "${book.title}"!`);
+      handleSearch(); // refresh list
+    } catch (error) {
+      console.error('Borrow error:', error);
+      alert('❌ Failed to borrow book.');
+    }
+  };
 
   useEffect(() => {
     if (query.trim() === '') {
@@ -150,18 +153,12 @@ export default function BookSearch() {
                   Published: {book.year}
                 </p>
               </div>
-              {!book.isBorrowed ? (
-                <button
-                  onClick={() => handleBorrow(book)}
-                  className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
-                >
-                  Borrow
-                </button>
-              ) : (
-                <span className="text-red-400 text-sm font-semibold mt-2 block">
-                  Already Borrowed
-                </span>
-              )}
+              <button
+                onClick={() => handleBorrow(book)}
+                className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+              >
+                Borrow
+              </button>
             </div>
           ))}
         </div>
